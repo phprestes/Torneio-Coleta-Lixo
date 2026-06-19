@@ -1,0 +1,9 @@
+[package]
+name = "interface_torneio_coleta_lixo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+crossterm = "0.29.0"
+postgres = "0.19.14"
+ratatui = "0.30.1"
