@@ -1,7 +1,4 @@
-SET search_path TO projeto_bd;
-
 -- Quais regiões coletaram a maior quantidade de lixo por categoria?
-
 
 -- Quantidade média de escolas que participam de cada tipo de campeonato ao longo dos anos?
 SELECT Ano, Fase AS Tipo_Campeonato, AVG(Qtd_Escolas) AS Media_Escolas FROM (
