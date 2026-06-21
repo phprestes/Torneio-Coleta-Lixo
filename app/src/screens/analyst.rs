@@ -16,6 +16,7 @@ thread_local! {
     static QUERY_RESULT: RefCell<Result<(Vec<String>, Vec<Vec<String>>), String>> = RefCell::new(Err(String::new()));
 }
 
+/// Renderiza a interface de Analista de Dados, exibindo o menu lateral e os resultados da query em tabela.
 pub fn render(_app: &App, frame: &mut Frame) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -81,6 +82,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
     }
 }
 
+/// Mapeia os botões de 1 a 5 para engatilhar consultas e o Esc para deslogar do Analista.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     match key {
         KeyCode::Char('1') => execute_query(1),
@@ -96,6 +98,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
+/// Roda o statement SQL selecionado no banco de dados e repassa o resultado para estado em tela.
 fn execute_query(query_id: u8) {
     let mut client = match db::get_client() {
         Ok(c) => c,
@@ -223,6 +226,7 @@ fn execute_query(query_id: u8) {
     }
 }
 
+/// Popula a thread local com os dados prontos (Células) a fim do painel da TUI conseguir exibi-los.
 fn set_result(res: Result<(Vec<String>, Vec<Vec<String>>), String>) {
     QUERY_RESULT.with(|q| *q.borrow_mut() = res);
 }

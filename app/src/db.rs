@@ -2,6 +2,7 @@ use postgres::{Client, NoTls};
 use std::env;
 use std::fs;
 
+/// Estabelece e retorna uma nova conexão com o banco de dados PostgreSQL baseada nas vars de ambiente.
 pub fn get_client() -> Result<Client, postgres::Error> {
     let host = env::var("DB_HOST").unwrap_or_else(|_| "localhost".to_string());
     let port = env::var("DB_PORT").unwrap_or_else(|_| "5432".to_string());
@@ -14,6 +15,7 @@ pub fn get_client() -> Result<Client, postgres::Error> {
     Client::connect(&db_url, NoTls)
 }
 
+/// Lê e executa os arquivos `.sql` locais para criar o esquema e os mocks iniciais caso necessário.
 pub fn initialize_db() -> Result<(), Box<dyn std::error::Error>> {
     // Carrega o .env (pode falhar silenciosamente caso o var de ambiente já esteja exportado via Makefile)
     dotenvy::from_filename("../.env").ok();

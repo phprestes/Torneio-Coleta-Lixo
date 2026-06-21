@@ -22,6 +22,7 @@ thread_local! {
     static STATE: RefCell<CollectionState> = RefCell::new(CollectionState::Login { input: String::new() });
 }
 
+/// Renderiza a interface do operador do Ponto de Coleta, adaptando de acordo com o estado do fluxo.
 pub fn render(_app: &App, frame: &mut Frame) {
     let state = STATE.with(|s| s.borrow().clone());
     let area = frame.area();
@@ -94,6 +95,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
     }
 }
 
+/// Recebe as entradas de digitação e navega pela máquina de estados da coleta.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     let state = STATE.with(|s| s.borrow().clone());
     match state {
@@ -179,6 +181,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
+/// Autentica se o ID do ponto de coleta é válido e existe uma partida para ele.
 fn authenticate_ponto(id_str: &str) {
     let id_val: i32 = match id_str.trim().parse() {
         Ok(v) => v,
@@ -211,6 +214,7 @@ fn authenticate_ponto(id_str: &str) {
     }
 }
 
+/// Executa as validações de restrição e salva os dados da coleta, incrementando pontos na tabela da equipe.
 fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, peso_str: &str) {
     let aluno_id: i32 = match aluno_id_str.trim().parse() {
         Ok(v) => v,

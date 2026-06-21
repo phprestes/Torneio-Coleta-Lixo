@@ -21,6 +21,7 @@ thread_local! {
     static STATE: RefCell<AdminState> = RefCell::new(AdminState::Menu);
 }
 
+/// Renderiza a interface interativa do painel do Administrador.
 pub fn render(_app: &App, frame: &mut Frame) {
     let state = STATE.with(|s| s.borrow().clone());
     let area = frame.area();
@@ -82,6 +83,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
     }
 }
 
+/// Processa os eventos de teclado e gerencia a máquina de estados do formulário de administração.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     let state = STATE.with(|s| s.borrow().clone());
     match state {
@@ -142,6 +144,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
+/// Salva a nova escola no banco de dados, utilizando transações seguras contra injeção SQL.
 fn save_school(doc_type: &str, doc_number: &str, country: &str, name: &str) {
     let mut client = match db::get_client() {
         Ok(c) => c,

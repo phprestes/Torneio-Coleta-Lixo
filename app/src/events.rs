@@ -3,6 +3,7 @@ use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use crate::app::{App, UserRole};
 use crate::screens;
 
+/// Escuta e processa eventos de teclado, roteando-os para a tela correspondente ao papel ativo.
 pub fn handle_events(app: &mut App) -> io::Result<()> {
     if let Event::Key(key) = event::read()? {
         if key.kind == KeyEventKind::Press {

@@ -16,6 +16,7 @@ thread_local! {
     static SPONSORS_CACHE: RefCell<Option<String>> = RefCell::new(None);
 }
 
+/// Renderiza a tela inicial (Splash Screen/Menu) que exibe o menu de seleção de papéis.
 pub fn render(_app: &App, frame: &mut Frame) {
     let area = centered_rect(80, 28, frame.area());
 
@@ -113,13 +114,14 @@ pub fn render(_app: &App, frame: &mut Frame) {
     frame.render_widget(sponsors, popup_layout[1]);
 }
 
-/// Função auxiliar que calcula o centro exato da tela.
+/// Utilitário interno para centralizar as caixas de diálogo na tela.
 fn centered_rect(width: u16, height: u16, r: Rect) -> Rect {
     let [area] = Layout::vertical([Constraint::Length(height)]).flex(Flex::Center).areas(r);
     let [area] = Layout::horizontal([Constraint::Length(width)]).flex(Flex::Center).areas(area);
     area
 }
 
+/// Captura o número digitado e altera o papel do usuário no roteador do App.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     match key {
         KeyCode::Char('1') => app.role = UserRole::Admin,

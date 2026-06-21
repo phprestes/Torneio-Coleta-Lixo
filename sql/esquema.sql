@@ -41,7 +41,7 @@ CREATE TABLE Lixo (
 );
 
 CREATE TABLE Transportadora (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Tipo_Documento VARCHAR(10) NOT NULL,
     Numero_Documento VARCHAR(20) NOT NULL,
     Sigla_Pais SIGLA_ALFA_3 NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE Transportadora (
 );
 
 CREATE TABLE Centro_de_Reciclagem (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Tipo_Documento VARCHAR(10) NOT NULL,
     Numero_Documento VARCHAR(20) NOT NULL,
     Sigla_Pais SIGLA_ALFA_3 NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE Patrocinadores_Torneio (
 );
 
 CREATE TABLE Tutor (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Tipo_Documento VARCHAR(10) NOT NULL,
     Numero_Documento VARCHAR(20) NOT NULL,
     Sigla_Pais SIGLA_ALFA_3 NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE Equipe (
 );
 
 CREATE TABLE Aluno (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Tipo_Documento VARCHAR(10) NOT NULL,
     Numero_Documento VARCHAR(20) NOT NULL,
     Sigla_Pais SIGLA_ALFA_3 NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE Aluno_Equipe (
 );
 
 CREATE TABLE Partida (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Torneio INTEGER NOT NULL,
     Fase VARCHAR(13) NOT NULL,
     Regiao VARCHAR(255) NOT NULL,
@@ -180,7 +180,7 @@ CREATE TABLE Equipe_Participa_Partida (
 );
 
 CREATE TABLE Ponto_de_Coleta (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Partida INTEGER NOT NULL,
     Latitude NUMERIC(10, 6) NOT NULL,
     Longitude NUMERIC(10, 6) NOT NULL,

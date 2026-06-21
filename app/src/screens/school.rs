@@ -22,6 +22,7 @@ thread_local! {
     static STATE: RefCell<SchoolState> = RefCell::new(SchoolState::Login { input: String::new() });
 }
 
+/// Renderiza o painel principal da Escola com seu respectivo ID de sessão ativo.
 pub fn render(_app: &App, frame: &mut Frame) {
     let state = STATE.with(|s| s.borrow().clone());
     let area = frame.area();
@@ -94,6 +95,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
     }
 }
 
+/// Gerencia a entrada das informações no formulário para submeter equipes pela Escola.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     let state = STATE.with(|s| s.borrow().clone());
     match state {
@@ -179,6 +181,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
+/// Exige uma escola existente no banco de dados para abrir o sistema de envio de equipes.
 fn authenticate_school(id_str: &str) {
     let id_val: i32 = match id_str.trim().parse() {
         Ok(v) => v,
@@ -210,6 +213,7 @@ fn authenticate_school(id_str: &str) {
     }
 }
 
+/// Realiza o cadastro propriamente dito da equipe e do tutor no modelo.
 fn save_team(school_id: i32, name: &str, year_str: &str, tutor_id_str: &str) {
     let year_val: i32 = match year_str.trim().parse() {
         Ok(v) => v,

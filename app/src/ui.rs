@@ -4,6 +4,7 @@ use crate::app::{App, UserRole};
 #[allow(unused_imports)]
 use crate::screens::{admin, guest, school, player, analyst, collection_point};
 
+/// Função principal que roteia a renderização da interface com base no papel (role) do usuário logado.
 pub fn render(app: &App, frame: &mut Frame) {
     match app.role {
         UserRole::Guest => guest::render(app, frame),

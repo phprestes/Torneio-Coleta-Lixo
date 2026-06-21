@@ -21,6 +21,7 @@ thread_local! {
     static STATE: RefCell<PlayerState> = RefCell::new(PlayerState::Login { input: String::new() });
 }
 
+/// Renderiza as informações de metadados da partida caso o jogador consiga fazer login.
 pub fn render(_app: &App, frame: &mut Frame) {
     let state = STATE.with(|s| s.borrow().clone());
     let area = frame.area();
@@ -149,6 +150,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
     }
 }
 
+/// Direciona o buffer de teclas numéricas para o processo de login como Aluno.
 pub fn handle_key(app: &mut App, key: KeyCode) {
     let state = STATE.with(|s| s.borrow().clone());
     match state {
@@ -189,6 +191,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
+/// Query massiva para descobrir toda a localização e contexto da partida atual em que o Aluno está ativo.
 fn authenticate_player(id_str: &str) {
     let id_val: i32 = match id_str.trim().parse() {
         Ok(v) => v,
