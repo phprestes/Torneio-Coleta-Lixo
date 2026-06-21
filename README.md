@@ -36,7 +36,7 @@ cp model.env .env
 ### 2️⃣ Subindo a Infraestrutura
 Com o Docker aberto, utilize nosso `Makefile` para inicializar a rede de contêineres e a base de dados:
 ```bash
-make db-up
+make db
 ```
 
 ### 3️⃣ Abrindo a Aplicação
