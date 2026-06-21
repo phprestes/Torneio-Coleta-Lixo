@@ -17,7 +17,7 @@ SELECT tr.Categoria, tr.Regiao, tr.Total_Peso FROM Totais_Regiao tr
 	INNER JOIN Maximos_Categoria mc ON tr.Categoria = mc.Categoria AND tr.Total_Peso = mc.Maximo_Peso;
 
 -- 2) Quantidade média de escolas que participam de cada tipo de campeonato ao longo dos anos?
-SELECT Ano, Fase AS Tipo_Campeonato, AVG(Qtd_Escolas) AS Media_Escolas FROM (
+SELECT Ano, Fase AS Tipo_Campeonato, ROUND(AVG(Qtd_Escolas)::NUMERIC, 2)  AS Media_Escolas FROM (
     SELECT p.Torneio AS Ano, p.Fase AS Fase, COUNT(DISTINCT a.Escola) AS Qtd_Escolas FROM Partida p
 		INNER JOIN Equipe_Participa_Partida ep ON p.ID = ep.Partida
 	    INNER JOIN Aluno a ON ep.Nome_Equipe = a.Nome_Equipe AND ep.Ano_Equipe = a.Ano_Equipe
@@ -25,9 +25,26 @@ SELECT Ano, Fase AS Tipo_Campeonato, AVG(Qtd_Escolas) AS Media_Escolas FROM (
 ) 
 GROUP BY Fase, Ano;
 
+-- Outro jeito, talvez mais correto
+SELECT Fase AS Tipo_Campeonato, ROUND(AVG(Qtd_Escolas)::NUMERIC, 2) AS Media_Escolas 
+FROM (
+    -- Subquery calcula o total por fase em cada ano
+    SELECT p.Torneio AS Ano, p.Fase AS Fase, COUNT(DISTINCT a.Escola) AS Qtd_Escolas 
+    FROM Partida p
+    INNER JOIN Equipe_Participa_Partida ep ON p.ID = ep.Partida
+    INNER JOIN Aluno a ON ep.Nome_Equipe = a.Nome_Equipe AND ep.Ano_Equipe = a.Ano_Equipe
+    GROUP BY p.Torneio, p.Fase
+) AS Base_Anual
+-- Ele junta os anos e tira a média de escolas de todas as fases ao longo de todos os anos
+GROUP BY Fase;
+
 -- 3) Faça um ranking de escola, pelo número de alunos MVP. Considerar as que não possuem MVPs e nem alunos cadastrados. 
 
-SELECT e.ID AS Escola_ID, e.Nome AS Nome_Escola, COUNT(p.AlunoMVP) AS Total_MVP FROM Escola e
+SELECT
+	-- Para mostrar o RANK de cada escola, foi feito essa parte do select usando o DENSE_RANK
+	-- porém foi decidido que faz mais sentido aplicar esse rank no front da aplicação e não nessa consulta
+    --CONCAT(DENSE_RANK() OVER (ORDER BY COUNT(p.AlunoMVP) DESC), 'º') AS Posicao_Ranking,
+	e.ID AS Escola_ID, e.Nome AS Nome_Escola, COUNT(p.AlunoMVP) AS Total_MVP FROM Escola e
 	-- Usa LEFT JOIN para garantir que todas as escolas apareçam no ranking, tendo alunos cadastrados ou não e tendo alunosMVP ou não
 	LEFT JOIN Aluno a ON e.ID = a.Escola
 	LEFT JOIN Partida p ON a.ID = p.AlunoMVP
