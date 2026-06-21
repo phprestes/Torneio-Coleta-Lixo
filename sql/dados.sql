@@ -74,3 +74,16 @@ INSERT INTO Logistica_Transporte (Ponto_de_Coleta, Transportadora, Centro_de_Rec
 (1, 1, 1),
 (2, 2, 2),
 (3, 3, 3);
+
+-- Inserindo alunos carona
+INSERT INTO Aluno (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola) VALUES
+(4, 'CNI', '111444888', 'FRA', 'Kylian Mbaguette', '33612345679', 2, 'Juliana Mbaguete', '33687654322', 2),
+
+(5, 'SSN', '222555999', 'USA', 'Mac Donald', '+12025550144', 11, 'Donald Mac', '+12025550198', 3),
+
+(6, 'CPF', '44455566688', 'BRA', 'Neymarzinho', '+5516988882223', 3, 'Neymar Idoso', '+5516977773334', 1);
+
+INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
+(4, 'Les Écolos', 2025),
+(5, 'GreenTeam', 2026),
+(6, 'EcoGuerreiros', 2024);

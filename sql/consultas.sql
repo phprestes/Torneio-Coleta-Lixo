@@ -20,9 +20,10 @@ SELECT tr.Categoria, tr.Regiao, tr.Total_Peso FROM Totais_Regiao tr
 SELECT Ano, Fase AS Tipo_Campeonato, ROUND(AVG(Qtd_Escolas)::NUMERIC, 2)  AS Media_Escolas FROM (
     SELECT p.Torneio AS Ano, p.Fase AS Fase, COUNT(DISTINCT a.Escola) AS Qtd_Escolas FROM Partida p
 		INNER JOIN Equipe_Participa_Partida ep ON p.ID = ep.Partida
-	    INNER JOIN Aluno a ON ep.Nome_Equipe = a.Nome_Equipe AND ep.Ano_Equipe = a.Ano_Equipe
+        INNER JOIN Aluno_Equipe ae ON ep.Nome_Equipe = ae.Nome_Equipe AND ep.Ano_Equipe = ae.Ano_Equipe
+	    INNER JOIN Aluno a ON ae.Aluno = a.ID
 	GROUP BY p.Torneio, p.Fase
-) 
+) AS Base_Agrupada
 GROUP BY Fase, Ano;
 
 -- Outro jeito, talvez mais correto
@@ -32,7 +33,8 @@ FROM (
     SELECT p.Torneio AS Ano, p.Fase AS Fase, COUNT(DISTINCT a.Escola) AS Qtd_Escolas 
     FROM Partida p
     INNER JOIN Equipe_Participa_Partida ep ON p.ID = ep.Partida
-    INNER JOIN Aluno a ON ep.Nome_Equipe = a.Nome_Equipe AND ep.Ano_Equipe = a.Ano_Equipe
+    INNER JOIN Aluno_Equipe ae ON ep.Nome_Equipe = ae.Nome_Equipe AND ep.Ano_Equipe = ae.Ano_Equipe
+    INNER JOIN Aluno a ON ae.Aluno = a.ID
     GROUP BY p.Torneio, p.Fase
 ) AS Base_Anual
 -- Ele junta os anos e tira a média de escolas de todas as fases ao longo de todos os anos
@@ -75,16 +77,18 @@ SELECT T.Partida_ID, T.Nome_Centro, T.Total_Recebido FROM Totais_Por_Centro T
 -- Seleciona o conjunto gerado pela subtração entre os conjuntos A - B
 SELECT * FROM (
 	-- CONJUNTO A: Alunos cujas equipes participaram de fases avançadas do torneio
-	SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, a.Nome_Equipe FROM Aluno a
+	SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, ae.Nome_Equipe FROM Aluno a
 	INNER JOIN Escola e ON a.Escola = e.ID
-	INNER JOIN Equipe_Participa_Partida ep ON a.Nome_Equipe = ep.Nome_Equipe AND a.Ano_Equipe = ep.Ano_Equipe
+    INNER JOIN Aluno_Equipe ae ON a.ID = ae.Aluno
+	INNER JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe
 	INNER JOIN Partida p ON ep.Partida = p.ID
 	WHERE UPPER(p.Fase) IN ('NACIONAL', 'CONTINENTAL', 'INTERNACIONAL')
 
 	EXCEPT
 	
 	-- CONJUNTO B: Alunos que realizaram pelo menos UMA entrega de lixo (em qualquer momento)
-	SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, a.Nome_Equipe FROM Aluno a
+	SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, ae.Nome_Equipe FROM Aluno a
 		INNER JOIN Escola e ON a.Escola = e.ID
+        INNER JOIN Aluno_Equipe ae ON a.ID = ae.Aluno
 		INNER JOIN Coleta c ON a.ID = c.Aluno
 );
