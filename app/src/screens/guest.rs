@@ -7,8 +7,14 @@ use ratatui::{
 };
 
 use crossterm::event::KeyCode;
+use std::cell::RefCell;
 
 use crate::app::{App, UserRole};
+use crate::db;
+
+thread_local! {
+    static SPONSORS_CACHE: RefCell<Option<String>> = RefCell::new(None);
+}
 
 pub fn render(_app: &App, frame: &mut Frame) {
     let area = centered_rect(80, 28, frame.area());
@@ -61,10 +67,40 @@ pub fn render(_app: &App, frame: &mut Frame) {
         .title(" Patrocinadores Oficiais ")
         .title_alignment(Alignment::Center);
 
+    let sponsors_str = SPONSORS_CACHE.with(|s| {
+        let mut cache = s.borrow_mut();
+        if cache.is_none() {
+            match db::get_client() {
+                Ok(mut client) => {
+                    let sql = "
+                        SELECT Patrocinador FROM Patrocinadores_Torneio 
+                        WHERE Torneio = (SELECT MAX(Ano) FROM Torneio)
+                    ";
+                    match client.query(sql, &[]) {
+                        Ok(rows) => {
+                            if rows.is_empty() {
+                                *cache = Some("Nenhum patrocinador cadastrado".to_string());
+                            } else {
+                                let names: Vec<String> = rows.iter().map(|r| r.get::<_, String>(0)).collect();
+                                *cache = Some(names.join("  •  "));
+                            }
+                        }
+                        Err(_) => {
+                            *cache = Some("Erro ao ler patrocinadores".to_string());
+                        }
+                    }
+                }
+                Err(_) => {
+                    *cache = Some("Conexão indisponível".to_string());
+                }
+            }
+        }
+        cache.as_ref().unwrap().clone()
+    });
+
     let sponsors_text = vec![
         Line::from(""),
-        // MOCK PATROCINADORES
-        Line::from("Prefeitura Municipal  •  ONG Planeta Verde  •  ReciclaMais S.A."),
+        Line::from(sponsors_str),
         Line::from(""),
         Line::from("Apoiando a sustentabilidade e a tecnologia".italic().dark_gray()),
     ];

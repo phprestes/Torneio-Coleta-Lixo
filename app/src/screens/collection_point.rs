@@ -238,7 +238,7 @@ fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, p
 
     let val_row = match client.query_one(
         "SELECT 
-            p.DataHora_Fim < CURRENT_DATE AS is_finished,
+            CURRENT_DATE BETWEEN p.DataHora_Inicio AND p.DataHora_Fim AS is_active,
             EXISTS(
                 SELECT 1 FROM Aluno_Equipe ae 
                 INNER JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe 
@@ -254,11 +254,11 @@ fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, p
         }
     };
 
-    let is_finished: Option<bool> = val_row.get(0);
+    let is_active: Option<bool> = val_row.get(0);
     let is_participating: bool = val_row.get(1);
 
-    if is_finished.unwrap_or(false) {
-        STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: "Esta partida já foi encerrada!".into() });
+    if !is_active.unwrap_or(false) {
+        STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: "Esta partida não está ativa!".into() });
         return;
     }
     
@@ -277,9 +277,6 @@ fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, p
 
     let pontuacao_kg: f64 = match row_opt {
         Some(r) => {
-            // Pontuacao_KG is numeric, so cast to float8 in Rust is fine as it's returned as such or we cast in sql... wait.
-            // Earlier I did not cast, let me fix it here just in case.
-            // Oh, numeric -> f64 might fail.
             0.0 // Placeholder. Let's fix the SQL.
         },
         None => {
