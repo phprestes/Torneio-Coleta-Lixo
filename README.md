@@ -1,53 +1,79 @@
-# Torneio de Coleta de Lixo - FICLE
+<div align="center">
+  <h1>♻️ Torneio de Coleta de Lixo - FICLE ♻️</h1>
+  <p><strong>Uma plataforma inovadora para promover engajamento estudantil e conscientização socioambiental através da gamificação!</strong></p>
+</div>
 
-Projeto desenvolvido para a disciplina **SCC0240 – Bases de Dados** no Instituto de Ciências Matemáticas e de Computação (ICMC-USP), ministrada pela Profa. Elaine Parros Machado de Sousa. O monitor PAE responsável foi Anderson Henrique Giacomini.
+<br>
 
-## Participantes
+## 📖 Sobre o Projeto
+O **Torneio de Coleta de Lixo** une esportes de coleta (como o famoso *SpoGomi*) a uma infraestrutura clássica de campeonatos. As escolas, equipes e alunos competem desde níveis regionais até o mundial para ver quem consegue coletar a maior quantidade e variedade de lixo reciclável!
 
-- Pedro Henrique de Sousa Prestes – 15507819
-- Laura Pazini Medeiros – 15468452
-- Fernando Valentim Torres – 15452340
-- Pedro Henrique Perez Dias – 15484075
-- Frederico Scheffel Oliveira – 15452718
+> 🏆 Promovido pela fictícia **Federação Internacional da Coleta de Lixo Esportiva (FICLE)**, este projeto atende diretamente os Objetivos de Desenvolvimento Sustentável (ODS) da ONU: **4 (Educação de Qualidade), 11 (Cidades Sustentáveis) e 12 (Consumo Responsável)**.
 
-## Sobre o Projeto
+Este repositório contém a **modelagem relacional** (PostgreSQL) e o protótipo de uma **Interface Gráfica de Linha de Comando (TUI)** desenvolvida em **Rust**.
 
-O **Torneio de Coleta de Lixo** é uma plataforma que promove o engajamento estudantil e a conscientização socioambiental por meio da gamificação da reciclagem. A competição visa unir as premissas de esportes de coleta, como o "SpoGomi", com infraestrutura de progressão clássica de campeonatos de programação (regional, nacional, continental, mundial).
+<br>
 
-Este projeto abrange a modelagem conceitual e lógica do banco de dados relacional e a construção de uma Interface Gráfica de Linha de Comando (TUI) em **Rust**, conectada a um banco **PostgreSQL**. A proposta atende aos Objetivos de Desenvolvimento Sustentável (ODS) da ONU: 4 (Educação de Qualidade), 11 (Cidades Sustentáveis) e 12 (Consumo Responsável).
+## 🛠 Tecnologias Utilizadas
 
-## Tecnologias Utilizadas
-- **Rust**: Linguagem base para o protótipo da aplicação CLI (utilizando `ratatui` e `crossterm`).
-- **PostgreSQL**: SGBD escolhido para a aplicação.
-- **Docker e Docker Compose**: Infraestrutura local da base de dados e ferramentas administrativas (PgAdmin).
+- 🦀 **Rust**: Criação da TUI moderna e interativa (via bibliotecas `ratatui` e `crossterm`).
+- 🐘 **PostgreSQL**: SGBD relacional responsável por gerenciar as complexidades das partidas, alunos e lixos.
+- 🐳 **Docker / Docker Compose**: Infraestrutura local ágil (inclui o banco de dados e o PgAdmin).
 
-## Como Rodar o Projeto
+<br>
 
-1. **Configuração de Ambiente**:
-   Na raiz do projeto, existe um arquivo `model.env`. Caso ainda não possua o arquivo `.env`, crie-o na raiz copiando as variáveis do modelo:
-   ```bash
-   cp model.env .env
-   ```
-   > **Aviso**: Por padrão, a variável `ALWAYS_RECREATE_DB=true` no arquivo `.env` fará com que o banco limpe todos os dados e rode os scripts de criação das tabelas toda vez que a aplicação abrir. Para manter dados salvos entre usos, modifique este valor para `false`.
+## 🚀 Como Rodar o Projeto
 
-2. **Iniciando a Base de Dados**:
-   Utilizando o utilitário `make`, você pode subir a base de dados rapidamente:
-   ```bash
-   make db-up
-   ```
+Siga os passos abaixo para ter a interface rodando em poucos segundos na sua máquina:
 
-3. **Iniciando a Aplicação**:
-   Para iniciar a UI interativa, rode o seguinte comando:
-   ```bash
-   make run
-   ```
-   *A compilação do Rust e a criação do schema no PostgreSQL acontecerão automaticamente.*
+### 1️⃣ Configurando o Ambiente
+Primeiro, garanta que você tenha o arquivo de variáveis de ambiente. Na raiz do projeto, basta copiar o arquivo modelo:
+```bash
+cp model.env .env
+```
+> ⚠️ **Aviso:** O `.env` possui a flag `ALWAYS_RECREATE_DB=true`. Ela fará com que o banco apague todos os dados e repopule o ambiente de testes (Mocks) toda vez que você abrir o app. Para manter seus registros salvos permanentemente, altere-a para `false`.
 
-4. **Encerrando a Base de Dados**:
-   Ao finalizar, você pode parar os containers e apagar os volumes de dados com o comando:
-   ```bash
-   make clean
-   ```
+### 2️⃣ Subindo a Infraestrutura
+Com o Docker aberto, utilize nosso `Makefile` para inicializar a rede de contêineres e a base de dados:
+```bash
+make db-up
+```
 
-## Acesso e Funcionalidades
-Pela interface principal, é possível acessar o painel do "Analista de Dados / Estatístico", o qual conta com 5 consultas SQL elaboradas especificamente para avaliar métricas do torneio, como alunos que não pontuam, centros de reciclagem que mais recebem doações e quantidade média de escolas participantes por fase de competição.
+### 3️⃣ Abrindo a Aplicação
+Com o banco pronto, inicialize a interface interativa em Rust! (O schema SQL e as dependências serão processadas automaticamente):
+```bash
+make run
+```
+
+### 🧹 Limpando tudo
+Ao terminar de explorar, você pode encerrar e destruir os volumes temporários com segurança:
+```bash
+make clean
+```
+
+<br>
+
+## 🎮 Funcionalidades do Sistema
+
+Nossa TUI (`Terminal User Interface`) simula a integração de vários atores dentro do ecossistema do campeonato:
+- 👑 **Administrador:** Cadastra e gerencia entidades raiz, como Escolas.
+- 🏫 **Organizador (Escolas):** Gerencia equipes de alunos que vão participar.
+- 🏃 **Jogador (Equipes):** Acompanha a classificação da sua equipe e os dados geográficos da sua partida atual.
+- 🏭 **Ponto de Coleta:** Responsável por registrar a pesagem do lixo por aluno, pontuando a equipe dinamicamente em tempo real.
+- 📊 **Analista de Dados:** Um painel gerencial contendo consultas estatísticas complexas em SQL (ex: alunos "carona", centros de reciclagem em destaque, médias de participação por região).
+
+<br>
+
+## 🎓 Equipe Acadêmica
+
+Projeto desenvolvido para a disciplina **SCC0240 – Bases de Dados** do **Instituto de Ciências Matemáticas e de Computação (ICMC-USP)**.
+- **Professora:** Elaine Parros Machado de Sousa
+- **Monitor PAE:** Anderson Henrique Giacomini
+
+| Participantes | Nº USP |
+|---|---|
+| 🧑‍💻 Pedro Henrique de Sousa Prestes | 15507819 |
+| 👩‍💻 Laura Pazini Medeiros | 15468452 |
+| 🧑‍💻 Fernando Valentim Torres | 15452340 |
+| 🧑‍💻 Pedro Henrique Perez Dias | 15484075 |
+| 🧑‍💻 Frederico Scheffel Oliveira | 15452718 |
