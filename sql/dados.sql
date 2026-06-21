@@ -75,7 +75,7 @@ INSERT INTO Logistica_Transporte (Ponto_de_Coleta, Transportadora, Centro_de_Rec
 (2, 2, 2),
 (3, 3, 3);
 
--- 1. Inserindo os novos alunos
+-- Inserindo alunos carona
 INSERT INTO Aluno (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola) VALUES
 (4, 'CNI', '111444888', 'FRA', 'Kylian Mbaguette', '33612345679', 2, 'Juliana Mbaguete', '33687654322', 2),
 
