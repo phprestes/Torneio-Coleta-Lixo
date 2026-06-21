@@ -236,6 +236,37 @@ fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, p
         }
     };
 
+    let val_row = match client.query_one(
+        "SELECT 
+            p.DataHora_Fim < CURRENT_DATE AS is_finished,
+            EXISTS(
+                SELECT 1 FROM Aluno_Equipe ae 
+                INNER JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe 
+                WHERE ae.Aluno = $1 AND ep.Partida = $2
+            ) AS is_participating
+        FROM Partida p WHERE p.ID = $2",
+        &[&aluno_id, &partida_id]
+    ) {
+        Ok(r) => r,
+        Err(e) => {
+            STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: format!("Erro ao validar partida: {}", e) });
+            return;
+        }
+    };
+
+    let is_finished: Option<bool> = val_row.get(0);
+    let is_participating: bool = val_row.get(1);
+
+    if is_finished.unwrap_or(false) {
+        STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: "Esta partida já foi encerrada!".into() });
+        return;
+    }
+    
+    if !is_participating {
+        STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: "Aluno não participa desta partida!".into() });
+        return;
+    }
+
     let row_opt = match client.query_opt("SELECT Pontuacao_KG FROM Lixo WHERE Categoria = $1", &[&lixo]) {
         Ok(r) => r,
         Err(e) => {
@@ -274,7 +305,17 @@ fn save_coleta(ponto_id: i32, partida_id: i32, aluno_id_str: &str, lixo: &str, p
     );
 
     match res {
-        Ok(_) => STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: format!("Coleta salva! Pontos gerados: {}", total_pontos) }),
+        Ok(_) => {
+            let _ = client.execute(
+                "UPDATE Equipe_Participa_Partida 
+                 SET Pontuacao = Pontuacao + $1::FLOAT8 
+                 WHERE Partida = $2 
+                 AND Nome_Equipe = (SELECT Nome_Equipe FROM Aluno_Equipe WHERE Aluno = $3) 
+                 AND Ano_Equipe = (SELECT Ano_Equipe FROM Aluno_Equipe WHERE Aluno = $3)",
+                &[&total_pontos, &partida_id, &aluno_id]
+            );
+            STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: format!("Coleta salva! Pontos gerados: {}", total_pontos) })
+        },
         Err(e) => {
             let error_msg = e.as_db_error().map(|db_e| db_e.message()).unwrap_or(&e.to_string()).to_string();
             STATE.with(|s| *s.borrow_mut() = CollectionState::Message { ponto_id: Some(ponto_id), partida_id: Some(partida_id), msg: format!("Erro ao salvar: {}", error_msg) })

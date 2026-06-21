@@ -3,11 +3,11 @@ INSERT INTO Torneio (Ano, Tema, Porcentagem_Regional, Porcentagem_Nacional, Porc
 (2025, 'Florestas e Reciclagem', 25.00, 20.00, 12.00, 6.00),
 (2026, 'Cidades Lixo Zero', 30.00, 25.00, 15.00, 10.00);
 
-INSERT INTO Escola (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome) VALUES
-(1, 'CNPJ', '12345678000199', 'BRA', 'Escola Estadual Rodrigues Alves'),
-(2, 'SIREN', '987654321', 'FRA', 'Lycée Louis-le-Grand'),
-(3, 'EIN', '112233445', 'USA', 'Springfield High School'),
-(4, 'CNPJ', '12388678110849', 'BRA', 'Colégio Objetivo - Unidade São Carlos');
+INSERT INTO Escola (Tipo_Documento, Numero_Documento, Sigla_Pais, Nome) VALUES
+('CNPJ', '12345678000199', 'BRA', 'Escola Estadual Rodrigues Alves'),
+('SIREN', '987654321', 'FRA', 'Lycée Louis-le-Grand'),
+('EIN', '112233445', 'USA', 'Springfield High School'),
+('CNPJ', '12388678110849', 'BRA', 'Colégio Objetivo - Unidade São Carlos');
 
 INSERT INTO Lixo (Categoria, Pontuacao_KG) VALUES
 ('Plástico', 10.0),

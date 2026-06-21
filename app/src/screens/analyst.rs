@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Alignment},
     style::{Color, Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, Paragraph, BorderType},
+    widgets::{Block, Borders, Paragraph, BorderType, Table, Row, Cell},
     Frame,
 };
 
@@ -13,8 +13,7 @@ use crate::db;
 use std::cell::RefCell;
 
 thread_local! {
-    static QUERY_RESULT: RefCell<String> = RefCell::new(String::new());
-    static SCROLL_OFFSET: RefCell<(u16, u16)> = RefCell::new((0, 0));
+    static QUERY_RESULT: RefCell<Result<(Vec<String>, Vec<Vec<String>>), String>> = RefCell::new(Err(String::new()));
 }
 
 pub fn render(_app: &App, frame: &mut Frame) {
@@ -46,53 +45,51 @@ pub fn render(_app: &App, frame: &mut Frame) {
     frame.render_widget(menu, chunks[0]);
 
     let res = QUERY_RESULT.with(|q| q.borrow().clone());
-    let result_text = if res.is_empty() {
-        "Aguardando execução da consulta...".to_string()
-    } else {
-        res
-    };
+    
+    match res {
+        Ok((header, rows_data)) => {
+            let num_cols = header.len() as u16;
+            let widths: Vec<Constraint> = (0..num_cols).map(|_| Constraint::Percentage(100 / num_cols)).collect();
+            
+            let header_cells = header.iter().map(|h| Cell::from(h.clone()).style(Style::default().fg(Color::Yellow)));
+            let header_row = Row::new(header_cells).bottom_margin(1);
+            
+            let mut table_rows = Vec::new();
+            for r in rows_data {
+                let cells = r.iter().map(|c| Cell::from(c.clone()));
+                table_rows.push(Row::new(cells));
+            }
 
-    let offset = SCROLL_OFFSET.with(|o| *o.borrow());
-    let result_p = Paragraph::new(result_text)
-        .block(Block::default().borders(Borders::ALL).title(" Resultado (Setas para Rolar) "))
-        .alignment(Alignment::Left)
-        .scroll((offset.1, offset.0));
+            let table = Table::new(table_rows, widths)
+                .header(header_row)
+                .block(Block::default().borders(Borders::ALL).title(" Resultado "));
+            frame.render_widget(table, chunks[1]);
+        }
+        Err(msg) => {
+            let result_text = if msg.is_empty() {
+                "Aguardando execução da consulta...".to_string()
+            } else {
+                msg
+            };
 
-    frame.render_widget(result_p, chunks[1]);
+            let result_p = Paragraph::new(result_text)
+                .block(Block::default().borders(Borders::ALL).title(" Resultado "))
+                .alignment(Alignment::Left);
+
+            frame.render_widget(result_p, chunks[1]);
+        }
+    }
 }
 
 pub fn handle_key(app: &mut App, key: KeyCode) {
     match key {
-        KeyCode::Char('1') => { SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0)); execute_query(1); },
-        KeyCode::Char('2') => { SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0)); execute_query(2); },
-        KeyCode::Char('3') => { SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0)); execute_query(3); },
-        KeyCode::Char('4') => { SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0)); execute_query(4); },
-        KeyCode::Char('5') => { SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0)); execute_query(5); },
-        KeyCode::Up => {
-            SCROLL_OFFSET.with(|o| {
-                let mut offset = o.borrow_mut();
-                if offset.1 > 0 { offset.1 -= 1; }
-            });
-        },
-        KeyCode::Down => {
-            SCROLL_OFFSET.with(|o| {
-                o.borrow_mut().1 += 1;
-            });
-        },
-        KeyCode::Left => {
-            SCROLL_OFFSET.with(|o| {
-                let mut offset = o.borrow_mut();
-                if offset.0 > 0 { offset.0 -= 1; }
-            });
-        },
-        KeyCode::Right => {
-            SCROLL_OFFSET.with(|o| {
-                o.borrow_mut().0 += 1;
-            });
-        },
+        KeyCode::Char('1') => execute_query(1),
+        KeyCode::Char('2') => execute_query(2),
+        KeyCode::Char('3') => execute_query(3),
+        KeyCode::Char('4') => execute_query(4),
+        KeyCode::Char('5') => execute_query(5),
         KeyCode::Esc => {
-            QUERY_RESULT.with(|q| *q.borrow_mut() = String::new());
-            SCROLL_OFFSET.with(|o| *o.borrow_mut() = (0, 0));
+            QUERY_RESULT.with(|q| *q.borrow_mut() = Err(String::new()));
             app.role = UserRole::Guest;
         }
         _ => {}
@@ -103,7 +100,7 @@ fn execute_query(query_id: u8) {
     let mut client = match db::get_client() {
         Ok(c) => c,
         Err(e) => {
-            set_result(&format!("Erro ao conectar ao banco: {}", e));
+            set_result(Err(format!("Erro ao conectar ao banco: {}", e)));
             return;
         }
     };
@@ -179,19 +176,14 @@ fn execute_query(query_id: u8) {
     match client.query(sql, &[]) {
         Ok(rows) => {
             if rows.is_empty() {
-                set_result("A consulta não retornou resultados.");
+                set_result(Err("A consulta não retornou resultados.".into()));
                 return;
             }
 
             let cols = rows[0].columns();
-            let mut output = String::new();
-
-            // Header
             let header: Vec<String> = cols.iter().map(|c| c.name().to_string()).collect();
-            output.push_str(&format!("| {} |\n", header.join(" | ")));
-            output.push_str(&format!("|{}|\n", vec!["---"; cols.len()].join("|")));
-
-            // Rows
+            
+            let mut all_rows = Vec::new();
             for row in &rows {
                 let mut row_data = Vec::new();
                 for (i, col) in cols.iter().enumerate() {
@@ -220,17 +212,17 @@ fn execute_query(query_id: u8) {
                     };
                     row_data.push(val);
                 }
-                output.push_str(&format!("| {} |\n", row_data.join(" | ")));
+                all_rows.push(row_data);
             }
 
-            set_result(&output);
+            set_result(Ok((header, all_rows)));
         }
         Err(e) => {
-            set_result(&format!("Erro ao executar consulta: {}", e));
+            set_result(Err(format!("Erro ao executar consulta: {}", e)));
         }
     }
 }
 
-fn set_result(res: &str) {
-    QUERY_RESULT.with(|q| *q.borrow_mut() = res.to_string());
+fn set_result(res: Result<(Vec<String>, Vec<Vec<String>>), String>) {
+    QUERY_RESULT.with(|q| *q.borrow_mut() = res);
 }

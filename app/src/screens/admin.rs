@@ -13,7 +13,7 @@ use std::cell::RefCell;
 #[derive(Clone)]
 enum AdminState {
     Menu,
-    InsertingSchool { step: u8, id: String, doc_type: String, doc_number: String, country: String, name: String },
+    InsertingSchool { step: u8, doc_type: String, doc_number: String, country: String, name: String },
     Message(String),
 }
 
@@ -46,33 +46,30 @@ pub fn render(_app: &App, frame: &mut Frame) {
             let p = Paragraph::new(text).block(Block::default().borders(Borders::ALL)).alignment(Alignment::Center).wrap(Wrap { trim: true });
             frame.render_widget(p, area);
         }
-        AdminState::InsertingSchool { step, id, doc_type, doc_number, country, name } => {
+        AdminState::InsertingSchool { step, doc_type, doc_number, country, name } => {
             let prompt = match step {
-                0 => "Digite o ID numérico da Escola:",
-                1 => "Digite o Tipo de Documento (ex: CNPJ, SIREN):",
-                2 => "Digite o Número do Documento:",
-                3 => "Digite a Sigla do País (3 letras, ex: BRA):",
-                4 => "Digite o Nome da Escola:",
+                0 => "Digite o Tipo de Documento (ex: CNPJ, SIREN):",
+                1 => "Digite o Número do Documento:",
+                2 => "Digite a Sigla do País (3 letras, ex: BRA):",
+                3 => "Digite o Nome da Escola:",
                 _ => "",
             };
 
             let current_input = match step {
-                0 => &id,
-                1 => &doc_type,
-                2 => &doc_number,
-                3 => &country,
-                4 => &name,
+                0 => &doc_type,
+                1 => &doc_number,
+                2 => &country,
+                3 => &name,
                 _ => "",
             };
 
             let text = vec![
                 Line::from("--- Cadastrando Nova Escola ---".cyan()),
                 Line::from(""),
-                Line::from(format!("ID: {}", if step > 0 { &id } else { "" })),
-                Line::from(format!("Tipo Doc: {}", if step > 1 { &doc_type } else { "" })),
-                Line::from(format!("Num Doc: {}", if step > 2 { &doc_number } else { "" })),
-                Line::from(format!("País: {}", if step > 3 { &country } else { "" })),
-                Line::from(format!("Nome: {}", if step > 4 { &name } else { "" })),
+                Line::from(format!("Tipo Doc: {}", if step > 0 { &doc_type } else { "" })),
+                Line::from(format!("Num Doc: {}", if step > 1 { &doc_number } else { "" })),
+                Line::from(format!("País: {}", if step > 2 { &country } else { "" })),
+                Line::from(format!("Nome: {}", if step > 3 { &name } else { "" })),
                 Line::from(""),
                 Line::from(prompt.yellow()),
                 Line::from(format!("> {}_", current_input)),
@@ -91,7 +88,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
         AdminState::Menu => {
             match key {
                 KeyCode::Char('1') => {
-                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step: 0, id: String::new(), doc_type: String::new(), doc_number: String::new(), country: String::new(), name: String::new() });
+                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step: 0, doc_type: String::new(), doc_number: String::new(), country: String::new(), name: String::new() });
                 }
                 KeyCode::Esc => app.role = UserRole::Guest,
                 _ => {}
@@ -103,43 +100,41 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
                 _ => {}
             }
         }
-        AdminState::InsertingSchool { mut step, mut id, mut doc_type, mut doc_number, mut country, mut name } => {
+        AdminState::InsertingSchool { mut step, mut doc_type, mut doc_number, mut country, mut name } => {
             match key {
                 KeyCode::Esc => {
                     STATE.with(|s| *s.borrow_mut() = AdminState::Menu);
                 }
                 KeyCode::Enter => {
                     step += 1;
-                    if step > 4 {
+                    if step > 3 {
                         // Salvar no banco
-                        save_school(&id, &doc_type, &doc_number, &country, &name);
+                        save_school(&doc_type, &doc_number, &country, &name);
                     } else {
-                        STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, id, doc_type, doc_number, country, name });
+                        STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, doc_type, doc_number, country, name });
                     }
                 }
                 KeyCode::Backspace => {
                     let target = match step {
-                        0 => &mut id,
-                        1 => &mut doc_type,
-                        2 => &mut doc_number,
-                        3 => &mut country,
-                        4 => &mut name,
+                        0 => &mut doc_type,
+                        1 => &mut doc_number,
+                        2 => &mut country,
+                        3 => &mut name,
                         _ => return,
                     };
                     target.pop();
-                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, id, doc_type, doc_number, country, name });
+                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, doc_type, doc_number, country, name });
                 }
                 KeyCode::Char(c) => {
                     let target = match step {
-                        0 => &mut id,
-                        1 => &mut doc_type,
-                        2 => &mut doc_number,
-                        3 => &mut country,
-                        4 => &mut name,
+                        0 => &mut doc_type,
+                        1 => &mut doc_number,
+                        2 => &mut country,
+                        3 => &mut name,
                         _ => return,
                     };
                     target.push(c);
-                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, id, doc_type, doc_number, country, name });
+                    STATE.with(|s| *s.borrow_mut() = AdminState::InsertingSchool { step, doc_type, doc_number, country, name });
                 }
                 _ => {}
             }
@@ -147,15 +142,7 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
     }
 }
 
-fn save_school(id_str: &str, doc_type: &str, doc_number: &str, country: &str, name: &str) {
-    let id_val: i32 = match id_str.trim().parse() {
-        Ok(v) => v,
-        Err(_) => {
-            STATE.with(|s| *s.borrow_mut() = AdminState::Message("ID deve ser um número inteiro válido!".into()));
-            return;
-        }
-    };
-
+fn save_school(doc_type: &str, doc_number: &str, country: &str, name: &str) {
     let mut client = match db::get_client() {
         Ok(c) => c,
         Err(e) => {
@@ -166,8 +153,8 @@ fn save_school(id_str: &str, doc_type: &str, doc_number: &str, country: &str, na
 
     // Prevenção a SQL Injection nativa usando prepared statements $1, $2, etc.
     let res = client.execute(
-        "INSERT INTO Escola (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome) VALUES ($1, $2, $3, $4::CHAR(3), $5)",
-        &[&id_val, &doc_type, &doc_number, &country, &name]
+        "INSERT INTO Escola (Tipo_Documento, Numero_Documento, Sigla_Pais, Nome) VALUES ($1, $2, $3::CHAR(3), $4)",
+        &[&doc_type, &doc_number, &country, &name]
     );
 
     match res {

@@ -13,7 +13,7 @@ use std::cell::RefCell;
 #[derive(Clone)]
 enum PlayerState {
     Login { input: String },
-    Dashboard { aluno_id: i32, equipe: String, partida_id: i32 },
+    Dashboard { aluno_id: i32, equipe: String, partida_id: i32, local: String, regiao: String, fase: String },
     Message(String),
 }
 
@@ -50,7 +50,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
             let p = Paragraph::new(text).block(Block::default().borders(Borders::ALL)).alignment(Alignment::Center).wrap(Wrap { trim: true });
             frame.render_widget(p, area);
         }
-        PlayerState::Dashboard { aluno_id: _, equipe, partida_id } => {
+        PlayerState::Dashboard { aluno_id: _, equipe, partida_id, local, regiao, fase } => {
             let main_layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([
@@ -68,7 +68,7 @@ pub fn render(_app: &App, frame: &mut Frame) {
                 ])
                 .split(main_layout[1]);
 
-            let header = Paragraph::new(format!(" PAINEL DO JOGADOR | Equipe: {} | Partida: {} ", equipe, partida_id))
+            let header = Paragraph::new(format!(" PAINEL DO JOGADOR | Equipe: {} | Partida: {} | Local: {} | Região: {} | Fase: {} ", equipe, partida_id, local, regiao, fase))
                 .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
                 .alignment(Alignment::Center)
                 .block(Block::default().borders(Borders::ALL).border_type(BorderType::Rounded));
@@ -207,7 +207,7 @@ fn authenticate_player(id_str: &str) {
     };
 
     let sql = "
-        SELECT ae.Nome_Equipe, ep.Partida 
+        SELECT ae.Nome_Equipe, ep.Partida, p.Local_Partida, p.Regiao, p.Fase
         FROM Aluno a
         INNER JOIN Aluno_Equipe ae ON ae.Aluno = a.ID
         LEFT JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe
@@ -223,7 +223,18 @@ fn authenticate_player(id_str: &str) {
             let equipe: String = row.get(0);
             let partida_id_opt: Option<i32> = row.get(1);
             if let Some(partida_id) = partida_id_opt {
-                STATE.with(|s| *s.borrow_mut() = PlayerState::Dashboard { aluno_id: id_val, equipe, partida_id });
+                let local: String = row.try_get(2).unwrap_or_else(|_| "Desconhecido".into());
+                let regiao: String = row.try_get(3).unwrap_or_else(|_| "Desconhecida".into());
+                let fase: String = row.try_get(4).unwrap_or_else(|_| "Desconhecida".into());
+
+                STATE.with(|s| *s.borrow_mut() = PlayerState::Dashboard { 
+                    aluno_id: id_val, 
+                    equipe, 
+                    partida_id,
+                    local,
+                    regiao,
+                    fase
+                });
             } else {
                 STATE.with(|s| *s.borrow_mut() = PlayerState::Message("Sua equipe ainda não está alocada em nenhuma partida!".into()));
             }

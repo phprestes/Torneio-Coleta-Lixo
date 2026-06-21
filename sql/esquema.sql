@@ -22,7 +22,7 @@ CREATE TABLE Torneio (
 );
 
 CREATE TABLE Escola (
-    ID INTEGER NOT NULL,
+    ID SERIAL NOT NULL,
     Tipo_Documento VARCHAR(10) NOT NULL,
     Numero_Documento VARCHAR(20) NOT NULL,
     Sigla_Pais SIGLA_ALFA_3 NOT NULL,
