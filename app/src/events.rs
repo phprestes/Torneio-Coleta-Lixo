@@ -13,21 +13,17 @@ pub fn handle_events(app: &mut App) -> io::Result<()> {
                     app.exit = true;
                     return Ok(());
                 }
-                KeyCode::Esc => {
-                    // Volta pro menu inicial
-                    app.role = UserRole::Guest; 
-                    return Ok(());
-                }
                 _ => {}
             }
 
             // ROTEADOR DE TELAS
             match app.role {
                 UserRole::Guest => screens::guest::handle_key(app, key.code),
-                // UserRole::Admin => screens::admin::handle_key(app, key.code),
-                // UserRole::Organizer => screens::organizer::handle_key(app, key.code),
-                // UserRole::Player => screens::player::handle_key(app, key.code),
-                _ => {} 
+                UserRole::Admin => screens::admin::handle_key(app, key.code),
+                UserRole::School => screens::school::handle_key(app, key.code),
+                UserRole::Player => screens::player::handle_key(app, key.code),
+                UserRole::Analyst => screens::analyst::handle_key(app, key.code),
+                UserRole::CollectionPoint => screens::collection_point::handle_key(app, key.code),
             }
         }
     }

@@ -40,8 +40,10 @@ pub fn render(_app: &App, frame: &mut Frame) {
         Line::from("Selecione seu perfil de acesso:".underlined()),
         Line::from(""),
         Line::from(vec!["[1] ".yellow().bold(), "Entrar como Administrador".into()]),
-        Line::from(vec!["[2] ".yellow().bold(), "Entrar como Organizador".into()]),
-        Line::from(vec!["[3] ".yellow().bold(), "Entrar como Jogador/Coletor".into()]),
+        Line::from(vec!["[2] ".yellow().bold(), "Entrar como Escola (Organizador)".into()]),
+        Line::from(vec!["[3] ".yellow().bold(), "Entrar como Jogador/Equipe".into()]),
+        Line::from(vec!["[4] ".yellow().bold(), "Entrar como Analista de Dados".into()]),
+        Line::from(vec!["[5] ".yellow().bold(), "Entrar como Ponto de Coleta".into()]),
         Line::from(vec!["[Q] ".red().bold(), "Sair do Sistema".into()]),
         Line::from(""),
         Line::from("Uma iniciativa da".italic()),
@@ -87,6 +89,8 @@ pub fn handle_key(app: &mut App, key: KeyCode) {
         KeyCode::Char('1') => app.role = UserRole::Admin,
         KeyCode::Char('2') => app.role = UserRole::School,
         KeyCode::Char('3') => app.role = UserRole::Player,
+        KeyCode::Char('4') => app.role = UserRole::Analyst,
+        KeyCode::Char('5') => app.role = UserRole::CollectionPoint,
         _ => {}
     }
 }

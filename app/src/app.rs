@@ -5,6 +5,8 @@ pub enum UserRole {
     Admin,
     School,
     Player,
+    Analyst,
+    CollectionPoint,
 }
 
 #[derive(Debug, Default)]
