@@ -97,8 +97,11 @@ CREATE TABLE Equipe (
     Tutor INTEGER NOT NULL,
     
     CONSTRAINT PK_Equipe PRIMARY KEY (Nome, Ano),
-    CONSTRAINT FK_Equipe FOREIGN KEY (Tutor)
+    CONSTRAINT FK_Equipe_Tutor FOREIGN KEY (Tutor)
         REFERENCES Tutor(ID)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_Equipe_Torneio FOREIGN KEY (Ano)
+        REFERENCES Torneio(Ano)
         ON DELETE CASCADE
 );
 
@@ -113,19 +116,28 @@ CREATE TABLE Aluno (
     Nome_Responsavel VARCHAR(255),
     Contato_Responsavel VARCHAR(15), 
     Escola INTEGER NOT NULL,
-    Nome_Equipe VARCHAR(255) NOT NULL,
-    Ano_Equipe INTEGER NOT NULL,
     
     CONSTRAINT PK_Aluno PRIMARY KEY (ID),
     CONSTRAINT UK_Aluno UNIQUE(Tipo_Documento, Numero_Documento, Sigla_Pais),
     CONSTRAINT FK_Aluno_Escola FOREIGN KEY (Escola)
         REFERENCES Escola(ID)
         ON DELETE CASCADE,
-    CONSTRAINT FK_Aluno_Equipe FOREIGN KEY (Nome_Equipe, Ano_Equipe)
-        REFERENCES Equipe(Nome, Ano)
-        ON DELETE CASCADE,
     CONSTRAINT CK_Aluno_Contato CHECK (Contato IS NULL OR Contato ~ '^\+?[0-9]{8,15}$'),
     CONSTRAINT CK_Resp_Contato CHECK (Contato_Responsavel IS NULL OR Contato_Responsavel ~ '^\+?[0-9]{8,15}$')
+);
+
+CREATE TABLE Aluno_Equipe (
+    Aluno INTEGER NOT NULL,
+    Nome_Equipe VARCHAR(255) NOT NULL,
+    Ano_Equipe INTEGER NOT NULL,
+
+    CONSTRAINT PK_Aluno_Equipe PRIMARY KEY (Aluno, Ano_Equipe),
+    CONSTRAINT FK_Rel_Aluno FOREIGN KEY (Aluno)
+        REFERENCES Aluno(ID)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_Rel_Equipe FOREIGN KEY (Nome_Equipe, Ano_Equipe)
+        REFERENCES Equipe(Nome, Ano)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE Partida (
@@ -218,4 +230,4 @@ CREATE TABLE Logistica_Transporte (
     CONSTRAINT FK_Logistica_Centro FOREIGN KEY (Centro_de_Reciclagem)
         REFERENCES Centro_de_Reciclagem(ID)
         ON DELETE CASCADE
-)
+);
