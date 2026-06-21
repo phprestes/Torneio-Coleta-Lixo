@@ -87,3 +87,55 @@ INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
 (4, 'Les Écolos', 2025),
 (5, 'GreenTeam', 2026),
 (6, 'EcoGuerreiros', 2024);
+
+-- ==========================================
+-- DADOS PARA CASOS ESPECIAIS (TESTES GERAIS)
+-- ==========================================
+
+-- Adicionando mais escolas (receberão IDs 5 e 6 devido ao SERIAL)
+INSERT INTO Escola (Tipo_Documento, Numero_Documento, Sigla_Pais, Nome) VALUES
+('CNPJ', '11111111000199', 'BRA', 'Colégio Teste Alpha'),
+('CNPJ', '22222222000199', 'BRA', 'Colégio Teste Beta');
+
+-- Adicionando mais tutores
+INSERT INTO Tutor (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Cargo, Escola) VALUES
+(4, 'CPF', '44444444444', 'BRA', 'Tutor Alpha', '+5516999999999', 'Professor', 5),
+(5, 'CPF', '55555555555', 'BRA', 'Tutor Beta', '+5516988888888', 'Professor', 6);
+
+-- Adicionando Múltiplas Equipes para o mesmo torneio
+INSERT INTO Equipe (Nome, Ano, Tutor) VALUES
+('Time Alpha', 2026, 4),
+('Time Beta', 2026, 5);
+
+-- Adicionando Alunos para essas novas equipes
+INSERT INTO Aluno (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola) VALUES
+(7, 'CPF', '77777777777', 'BRA', 'Aluno Alpha 1', '+5511', 1, 'Resp Alpha 1', '+5511', 5),
+(8, 'CPF', '88888888888', 'BRA', 'Aluno Alpha 2', '+5522', 1, 'Resp Alpha 2', '+5522', 5),
+(9, 'CPF', '99999999999', 'BRA', 'Aluno Beta 1', '+5533', 1, 'Resp Beta 1', '+5533', 6);
+
+INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
+(7, 'Time Alpha', 2026),
+(8, 'Time Alpha', 2026),
+(9, 'Time Beta', 2026);
+
+-- Partida ocorrendo AGORA (Gordura de 15 dias antes até 15 dias depois da data de hoje)
+INSERT INTO Partida (ID, Torneio, Fase, Regiao, Local_Partida, DataHora_Inicio, DataHora_Fim, AlunoMVP) VALUES
+(5, 2026, 'NACIONAL', 'Sul BR', 'Florianópolis - SC', CURRENT_DATE - 15, CURRENT_DATE + 15, NULL);
+
+-- Inserindo as duas equipes na mesma partida (Partida 5)
+INSERT INTO Equipe_Participa_Partida (Nome_Equipe, Ano_Equipe, Partida, Pontuacao) VALUES
+('Time Alpha', 2026, 5, 20.0),
+('Time Beta', 2026, 5, 25.0);
+
+-- Ponto de coleta exclusivo para a partida atual
+INSERT INTO Ponto_de_Coleta (ID, Partida, Latitude, Longitude) VALUES
+(4, 5, -27.595400, -48.548000);
+
+-- Logística para o novo ponto
+INSERT INTO Logistica_Transporte (Ponto_de_Coleta, Transportadora, Centro_de_Reciclagem) VALUES
+(4, 1, 1);
+
+-- Algumas coletas na partida atual para refletir os pontos mockados
+INSERT INTO Coleta (Aluno, Ponto_de_Coleta, Data_Hora, Lixo, Peso, Pontuacao) VALUES
+(7, 4, CURRENT_TIMESTAMP, 'Plástico', 2.0, 20.0),
+(9, 4, CURRENT_TIMESTAMP, 'Vidro', 5.0, 25.0);
