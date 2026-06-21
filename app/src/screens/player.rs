@@ -207,9 +207,10 @@ fn authenticate_player(id_str: &str) {
     };
 
     let sql = "
-        SELECT a.Nome_Equipe, ep.Partida 
+        SELECT ae.Nome_Equipe, ep.Partida 
         FROM Aluno a
-        LEFT JOIN Equipe_Participa_Partida ep ON a.Nome_Equipe = ep.Nome_Equipe AND a.Ano_Equipe = ep.Ano_Equipe
+        INNER JOIN Aluno_Equipe ae ON ae.Aluno = a.ID
+        LEFT JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe
         LEFT JOIN Partida p ON p.ID = ep.Partida
         WHERE a.ID = $1 
         ORDER BY p.DataHora_Inicio DESC NULLS LAST

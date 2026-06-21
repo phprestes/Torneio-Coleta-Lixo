@@ -39,10 +39,15 @@ INSERT INTO Equipe (Nome, Ano, Tutor) VALUES
 ('Les Écolos', 2025, 2),
 ('GreenTeam', 2026, 3);
 
-INSERT INTO Aluno (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola, Nome_Equipe, Ano_Equipe) VALUES
-(1, 'CPF', '44455566677', 'BRA', 'Pedro Henrique', '+5516988882222', 3, 'João Henrique', '+5516977773333', 1, 'EcoGuerreiros', 2024),
-(2, 'CNI', '111444777', 'FRA', 'Laura Pazini', '33612345678', 2, 'Jean Pazini', '33687654321', 2, 'Les Écolos', 2025),
-(3, 'SSN', '222555888', 'USA', 'Fernando Torres', '+12025550143', 11, 'Maria Torres', '+12025550199', 3, 'GreenTeam', 2026);
+INSERT INTO Aluno (ID, Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola) VALUES
+(1, 'CPF', '44455566677', 'BRA', 'Pedro Henrique', '+5516988882222', 3, 'João Henrique', '+5516977773333', 1),
+(2, 'CNI', '111444777', 'FRA', 'Laura Pazini', '33612345678', 2, 'Jean Pazini', '33687654321', 2),
+(3, 'SSN', '222555888', 'USA', 'Fernando Torres', '+12025550143', 11, 'Maria Torres', '+12025550199', 3);
+
+INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
+(1, 'EcoGuerreiros', 2024),
+(2, 'Les Écolos', 2025),
+(3, 'GreenTeam', 2026);
 
 INSERT INTO Partida (ID, Torneio, Fase, Regiao, Local_Partida, DataHora_Inicio, DataHora_Fim, AlunoMVP) VALUES
 (1, 2024, 'REGIONAL', 'Sudeste BR', 'Bairro da Liberdade', '2024-05-10', '2024-05-12', 1),

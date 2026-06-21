@@ -129,7 +129,8 @@ fn execute_query(query_id: u8) {
                 SELECT p.Torneio AS Ano, p.Fase AS Fase, COUNT(DISTINCT a.Escola) AS Qtd_Escolas 
                 FROM Partida p
                 INNER JOIN Equipe_Participa_Partida ep ON p.ID = ep.Partida
-                INNER JOIN Aluno a ON ep.Nome_Equipe = a.Nome_Equipe AND ep.Ano_Equipe = a.Ano_Equipe
+                INNER JOIN Aluno_Equipe ae ON ep.Nome_Equipe = ae.Nome_Equipe AND ep.Ano_Equipe = ae.Ano_Equipe
+                INNER JOIN Aluno a ON ae.Aluno = a.ID
                 GROUP BY p.Torneio, p.Fase
             ) AS Base_Anual
             GROUP BY Fase;
@@ -158,18 +159,21 @@ fn execute_query(query_id: u8) {
         ",
         5 => "
             SELECT * FROM (
-                SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, a.Nome_Equipe FROM Aluno a
+                SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, ae.Nome_Equipe FROM Aluno a
                 INNER JOIN Escola e ON a.Escola = e.ID
-                INNER JOIN Equipe_Participa_Partida ep ON a.Nome_Equipe = ep.Nome_Equipe AND a.Ano_Equipe = ep.Ano_Equipe
+                INNER JOIN Aluno_Equipe ae ON ae.Aluno = a.ID
+                INNER JOIN Equipe_Participa_Partida ep ON ae.Nome_Equipe = ep.Nome_Equipe AND ae.Ano_Equipe = ep.Ano_Equipe
                 INNER JOIN Partida p ON ep.Partida = p.ID
                 WHERE UPPER(p.Fase) IN ('NACIONAL', 'CONTINENTAL', 'INTERNACIONAL')
                 EXCEPT
-                SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, a.Nome_Equipe FROM Aluno a
+                SELECT a.ID AS ID_Aluno, a.Nome AS Nome_Aluno, e.Nome AS Nome_Escola, ae.Nome_Equipe FROM Aluno a
                 INNER JOIN Escola e ON a.Escola = e.ID
+                INNER JOIN Aluno_Equipe ae ON ae.Aluno = a.ID
                 INNER JOIN Coleta c ON a.ID = c.Aluno
-            ) AS Caronas;
+            ) Alunos_Caronas
+            ORDER BY ID_Aluno;
         ",
-        _ => return,
+        _ => "",
     };
 
     match client.query(sql, &[]) {
