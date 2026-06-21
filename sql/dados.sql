@@ -51,7 +51,7 @@ INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
 
 INSERT INTO Partida (ID, Torneio, Fase, Regiao, Local_Partida, DataHora_Inicio, DataHora_Fim, AlunoMVP) VALUES
 (1, 2024, 'REGIONAL', 'Sudeste BR', 'Bairro da Liberdade', '2024-05-10', '2024-05-12', 1),
-(2, 2025, 'NACIONAL', 'França Centro', 'Paris Sul', '2025-06-15', '2025-06-15', 2),
+(2, 2025, 'NACIONAL', 'França', 'Paris Sul', '2025-06-15', '2025-06-15', 2),
 (3, 2026, 'INTERNACIONAL', 'Mundial', 'São Carlos - SP', '2026-07-20', '2026-07-25', 3),
 (4, 2025, 'REGIONAL', 'Sudeste BR', 'Bairro da Liberdade 2', '2024-05-10', '2025-05-12', 1);
 
