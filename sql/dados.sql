@@ -109,9 +109,9 @@ INSERT INTO Equipe (Nome, Ano, Tutor) VALUES
 
 -- Adicionando Alunos para essas novas equipes
 INSERT INTO Aluno (Tipo_Documento, Numero_Documento, Sigla_Pais, Nome, Contato, Serie, Nome_Responsavel, Contato_Responsavel, Escola) VALUES
-('CPF', '77777777777', 'BRA', 'Aluno Alpha 1', '+5511', 1, 'Resp Alpha 1', '+5511', 5),
-('CPF', '88888888888', 'BRA', 'Aluno Alpha 2', '+5522', 1, 'Resp Alpha 2', '+5522', 5),
-('CPF', '99999999999', 'BRA', 'Aluno Beta 1', '+5533', 1, 'Resp Beta 1', '+5533', 6);
+('CPF', '77777777777', 'BRA', 'Aluno Alpha 1', '+5511999990001', 1, 'Resp Alpha 1', '+5511999990002', 5),
+('CPF', '88888888888', 'BRA', 'Aluno Alpha 2', '+5522999990001', 1, 'Resp Alpha 2', '+5522999990002', 5),
+('CPF', '99999999999', 'BRA', 'Aluno Beta 1', '+5533999990001', 1, 'Resp Beta 1', '+5533999990002', 6);
 
 INSERT INTO Aluno_Equipe (Aluno, Nome_Equipe, Ano_Equipe) VALUES
 (7, 'Time Alpha', 2026),
